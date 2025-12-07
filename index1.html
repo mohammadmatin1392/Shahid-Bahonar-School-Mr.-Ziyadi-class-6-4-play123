@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>بازی زاویه حرفه‌ای</title>
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Tahoma", sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80') no-repeat center center;
+    background-size: cover;
+    
+}
+
+.static-box {
+    position: absolute;
+    left: 50%;
+    bottom: 20rem; /* ارتفاع زاویه خاکستری */
+    transform: translateX(-50%);
+    opacity: 0.5;
+    z-index: 5;
+}
+
+.static-shadow {
+    width: 200px;
+    height: 30px;
+    background: rgba(0,0,0,0.25);
+    border-radius: 50%;
+    filter: blur(10px);
+    position: absolute;
+    left: 50%;
+    bottom: 18rem; /* کمی پایین‌تر */
+    transform: translateX(-50%);
+    z-index: 4;
+}
+
+.rotate-box {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    bottom: 20rem; /* هم‌سطح زاویه خاکستری */
+    transform: translateX(-50%);
+    z-index: 10;
+    cursor: pointer;
+}
+
+#message {
+    display: none;
+    margin-top: 1rem;
+    font-size: 28px;
+    font-weight: bold;
+    color: green;
+    text-shadow: 1px 1px 3px #000;
+}
+
+#question-container {
+    display: none;
+    margin-top: 2rem;
+    text-align: center;
+    padding: 20px;
+    background: rgba(255,255,255,0.9);
+    border-radius: 20px;
+    box-shadow: 3px 3px 15px rgba(0,0,0,0.3);
+    animation: fadeIn 1s ease-in-out;
+}
+
+#question-container h2 {
+    font-size: 24px;
+    margin-bottom: 15px;
+    color: #0d47a1;
+}
+
+.options {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+button.option-btn {
+    width: 90px;
+    height: 90px;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    border-radius: 15px;
+    border: 3px solid #0d47a1;
+    background: linear-gradient(145deg,#ffd54f,#f57f17);
+    color: #fff;
+    box-shadow: 2px 2px 10px rgba(0,0,0,0.3);
+    transition: all 0.3s;
+}
+
+button.option-btn:hover {
+    transform: scale(1.1);
+    box-shadow: 4px 4px 15px rgba(0,0,0,0.5);
+}
+
+@keyframes fadeIn {
+    from {opacity: 0; transform: translateY(-20px);}
+    to {opacity: 1; transform: translateY(0);}
+}
+</style>
+</head>
+<body>
+
+<!-- زاویه ثابت خاکستری -->
+<div class="static-box">
+    <svg width="300" height="300">
+        <line x1="150" y1="150" x2="270" y2="150" stroke="#555" stroke-width="10"/>
+        <line x1="150" y1="150" x2="150" y2="30" stroke="#555" stroke-width="10"/>
+        <rect x="150" y="125" width="25" height="25" fill="#aaa" stroke="#777" stroke-width="4"/>
+    </svg>
+</div>
+
+<div class="static-shadow"></div>
+
+<!-- زاویه چرخان -->
+<div class="rotate-box" id="rotating">
+    <svg width="300" height="300">
+        <line x1="150" y1="150" x2="270" y2="150" stroke="#0d47a1" stroke-width="10" stroke-linecap="round"/>
+        <line x1="150" y1="150" x2="150" y2="30" stroke="#c62828" stroke-width="10" stroke-linecap="round"/>
+        <rect x="150" y="125" width="25" height="25" fill="#ffd54f" stroke="#f57f17" stroke-width="4"/>
+    </svg>
+</div>
+
+<div id="message"></div>
+
+<div id="question-container">
+    <h2>این زاویه چند درجه است؟</h2>
+    <div class="options">
+        <button class="option-btn" data-value="30">۳۰°</button>
+        <button class="option-btn" data-value="45">۴۵°</button>
+        <button class="option-btn" data-value="90">۹۰°</button>
+    </div>
+</div>
+
+<script>
+let rotateBox = document.getElementById('rotating');
+let message = document.getElementById('message');
+let questionContainer = document.getElementById('question-container');
+
+let rotation = 0;
+let spinning = true;
+const correctAngle = 0; // زاویه خاکستری
+const tolerance = 10;
+
+// چرخش سریع
+setInterval(() => {
+    if (spinning) {
+        rotation += 15; // سرعت بالا
+        rotation %= 360;
+        rotateBox.style.transform = `rotate(${rotation}deg) translateX(-50%)`;
+    }
+}, 50);
+
+// کلیک روی زاویه
+rotateBox.addEventListener('click', () => {
+    if (!spinning) return;
+    spinning = false;
+    let current = rotation % 360;
+    if (current <= correctAngle + tolerance || current >= 360 - tolerance) {
+        message.textContent = "🎉 آفرین!";
+        message.style.color = "green";
+        message.style.display = "block";
+        // بعد از 1.5 ثانیه سوال ظاهر شود
+        setTimeout(() => {
+            message.style.display = "none";
+            questionContainer.style.display = "block";
+        }, 1500);
+    } else {
+        message.textContent = "❌ غلط است، دوباره بچرخانید!";
+        message.style.color = "red";
+        message.style.display = "block";
+        setTimeout(() => {
+            message.style.display = "none";
+            spinning = true;
+        }, 1000);
+    }
+});
+
+// بررسی پاسخ‌ها
+document.querySelectorAll('.option-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+        let answer = btn.getAttribute('data-value');
+        if (answer == '90') {
+            message.textContent = "🎉 درست است! تبریک!";
+            message.style.color = "green";
+            message.style.display = "block";
+            questionContainer.style.display = "none";
+        } else {
+            message.textContent = "❌ پاسخ اشتباه!";
+            message.style.color = "red";
+            message.style.display = "block";
+            setTimeout(() => {
+                message.style.display = "none";
+            }, 1200);
+        }
+         setTimeout(() => {
+                window.location.href = "index2.html";
+            }, 3000);
+    });
+});
+</script>
+
+</body>
+</html>

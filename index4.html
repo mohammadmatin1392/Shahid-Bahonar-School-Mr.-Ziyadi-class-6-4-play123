@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="fa">
+<head>
+<meta charset="UTF-8">
+<title>بازی زاویه 30°</title>
+
+<style>
+body {
+    margin: 0;
+    height: 100vh;
+    font-family: "Tahoma";
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    background: url('https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=1400&q=80') no-repeat center center;
+                no-repeat center center;
+    background-size: cover;
+}
+
+/* زاویه ثابت */
+.static-box {
+    position: absolute;
+    left: 50%;
+    bottom: 20rem;
+    transform: translateX(-50%);
+    opacity: 0.5;
+    z-index: 5;
+}
+
+/* سایه زیر زاویه */
+.static-shadow {
+    width: 200px;
+    height: 28px;
+    background: rgba(0,0,0,0.25);
+    filter: blur(10px);
+    border-radius: 50%;
+    position: absolute;
+    left: 50%;
+    bottom: 18rem;
+    transform: translateX(-50%);
+    z-index: 4;
+}
+
+/* زاویه چرخان */
+.rotate-box {
+    width: 300px;
+    height: 300px;
+    position: absolute;
+    left: 50%;
+    bottom: 20rem;
+    transform: translateX(-50%);
+    cursor: pointer;
+    z-index: 10;
+}
+
+/* پیام درست/غلط */
+#message {
+    display: none;
+    margin-top: 20px;
+    font-size: 30px;
+    font-weight: bold;
+    color: green;
+    text-shadow: 1px 1px 3px black;
+}
+
+/* پنل سوال */
+#question-box {
+    display: none;
+    margin-top: 20px;
+    background: rgba(255,255,255,0.9);
+    padding: 20px;
+    border-radius: 20px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.3);
+    text-align: center;
+}
+
+.option-btn {
+    width: 90px;
+    height: 90px;
+    border-radius: 20px;
+    border: none;
+    margin: 10px;
+    font-size: 22px;
+    font-weight: bold;
+    background: linear-gradient(145deg, #4fc3f7, #0288d1);
+    color: white;
+    cursor: pointer;
+    transition: 0.3s;
+}
+
+.option-btn:hover {
+    transform: scale(1.1);
+}
+</style>
+</head>
+<body>
+
+<!-- زاویه ثابت (۳۰ درجه) -->
+<div class="static-box">
+    <svg width="300" height="300">
+        <!-- بازوی افقی -->
+        <line x1="150" y1="150" x2="280" y2="150" stroke="#3949ab" stroke-width="10"/>
+
+        <!-- بازوی ۳۰ درجه: 30° = شیب کم -->
+        <line x1="150" y1="150" x2="250" y2="70"
+              stroke="#d32f2f" stroke-width="10"/>
+
+        <!-- مربع -->
+      
+    </svg>
+</div>
+
+<div class="static-shadow"></div>
+
+<!-- زاویه چرخنده -->
+<div class="rotate-box" id="rotating">
+    <svg width="300" height="300">
+        <line x1="150" y1="150" x2="280" y2="150"
+              stroke="#42a5f5" stroke-width="10"/>
+
+        <line x1="150" y1="150" x2="250" y2="70"
+              stroke="#ef5350" stroke-width="10"/>
+
+      
+    </svg>
+</div>
+
+<div id="message"></div>
+
+<!-- سوال -->
+<div id="question-box">
+    <h2>این زاویه چند درجه است؟</h2>
+    <button class="option-btn" data-value="100">100°</button>
+    <button class="option-btn" data-value="90">90°</button>
+    <button class="option-btn" data-value="30">30°</button>
+</div>
+
+<script>
+let rotBox = document.getElementById("rotating");
+let message = document.getElementById("message");
+let questionBox = document.getElementById("question-box");
+
+let rotation = 0;
+let spinning = true;
+
+const correctAngle = 0;
+const tolerance = 12;
+
+/* چرخش سریع */
+setInterval(() => {
+    if (spinning) {
+        rotation += 14;
+        rotation %= 360;
+        rotBox.style.transform =
+            `translateX(-50%) rotate(${rotation}deg)`;
+    }
+}, 50);
+
+/* توقف روی زاویه درست */
+rotBox.addEventListener("click", () => {
+    if (!spinning) return;
+
+    spinning = false;
+    let now = rotation % 360;
+
+    if (now <= tolerance || now >= 360 - tolerance) {
+        message.innerHTML = "🎉 عالی! درست است!";
+        message.style.color = "lime";
+        message.style.display = "block";
+
+        setTimeout(() => {
+            message.style.display = "none";
+            questionBox.style.display = "block";
+        }, 1500);
+
+    } else {
+        message.innerHTML = "❌ اشتباهه! دوباره امتحان کن!";
+        message.style.color = "red";
+        message.style.display = "block";
+
+        setTimeout(() => {
+            message.style.display = "none";
+            spinning = true;
+        }, 1200);
+    }
+});
+
+/* بررسی گزینه‌ها */
+document.querySelectorAll(".option-btn").forEach(btn => {
+    btn.addEventListener("click", () => {
+        let val = btn.getAttribute("data-value");
+
+        if (val == "30") {
+            message.innerHTML = "🎯 آفرین! پاسخ درست است!";
+            message.style.color = "lime";
+            message.style.display = "block";
+            questionBox.style.display = "none";
+
+        } else {
+            message.innerHTML = "❌ نه، دوباره تلاش کن!";
+            message.style.color = "red";
+            message.style.display = "block";
+
+            setTimeout(() => {
+                message.style.display = "index5.html";
+            }, 1200);
+        }
+    });
+});
+</script>
+
+</body>
+</html>
